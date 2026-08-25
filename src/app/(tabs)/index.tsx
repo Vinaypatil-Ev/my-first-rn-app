@@ -4,24 +4,33 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 export default function Index() {
   return (
     <View style={styles.container}>
-      <ButtonView label="Sign Up" link="/(auth)/signUp" />
-      <ButtonView label="Log in" link="/(auth)/logIn" />
-      <ButtonView label="Pricing" link="/(tabs)/pricing" />
-      <ButtonView label="settings" link="/(tabs)/settings" />
-      <ButtonView label="settings" link="/(tabs)/settings" />
+      <ButtonView label="Sign Up" href="/(auth)/signUp" />
+      <ButtonView label="Log in" href="/(auth)/logIn" />
+      <ButtonView label="Pricing" href="/(tabs)/pricing" />
+      <ButtonView label="settings" href="/(tabs)/settings" />
+      <ButtonView label="settings" href="/(tabs)/settings" />
+      <ButtonView
+        label="netflix"
+        href={{
+          pathname: "/subscription/[id]",
+          params: {
+            id: "netflix",
+          },
+        }}
+      />
     </View>
   );
 }
 
 type ButtonViewProps = {
   label: string;
-  link: Href;
+  href: Href;
 };
 
-const ButtonView = ({ label, link }: ButtonViewProps) => {
+const ButtonView = ({ label, href }: ButtonViewProps) => {
   return (
     <View>
-      <Link href={link} asChild>
+      <Link href={href} asChild>
         <Pressable className="mt-4 rounded bg-black p-4">
           <Text className="text-white">{label}</Text>
         </Pressable>
