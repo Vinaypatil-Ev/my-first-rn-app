@@ -1,24 +1,30 @@
 import { Href, Link } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { styled } from "nativewind";
+import { Pressable, Text, View } from "react-native";
+import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
+
+const SafeAreaView = styled(RNSafeAreaView);
 
 export default function Index() {
   return (
-    <View style={styles.container}>
-      <ButtonView label="Sign Up" href="/(auth)/signUp" />
-      <ButtonView label="Log in" href="/(auth)/logIn" />
-      <ButtonView label="Pricing" href="/(tabs)/pricing" />
-      <ButtonView label="settings" href="/(tabs)/settings" />
-      <ButtonView label="settings" href="/(tabs)/settings" />
-      <ButtonView
-        label="netflix"
-        href={{
-          pathname: "/subscription/[id]",
-          params: {
-            id: "netflix",
-          },
-        }}
-      />
-    </View>
+    <SafeAreaView className="flex-1 bg-background p-4">
+      <View>
+        <ButtonView label="Sign Up" href="/(auth)/signUp" />
+        <ButtonView label="Log in" href="/(auth)/logIn" />
+        <ButtonView label="Pricing" href="/(tabs)/pricing" />
+        <ButtonView label="settings" href="/(tabs)/settings" />
+        <ButtonView label="settings" href="/(tabs)/settings" />
+        <ButtonView
+          label="netflix"
+          href={{
+            pathname: "/subscription/[id]",
+            params: {
+              id: "netflix",
+            },
+          }}
+        />
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -39,10 +45,10 @@ const ButtonView = ({ label, href }: ButtonViewProps) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     alignItems: "center",
+//     justifyContent: "center",
+//   },
+// });
