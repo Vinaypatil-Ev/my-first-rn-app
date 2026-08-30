@@ -17,6 +17,10 @@ import setting from "@/assets/icons/setting.png";
 import spotify from "@/assets/icons/spotify.png";
 import wallet from "@/assets/icons/wallet.png";
 
+const aiProfile27 = {
+  uri: "https://json-server.dev/ai-profiles/27.png",
+};
+
 export const icons = {
   home,
   wallet,
@@ -36,6 +40,7 @@ export const icons = {
   github,
   claude,
   canva,
+  aiProfile27,
 } as const;
 
 export type IconKey = keyof typeof icons;
