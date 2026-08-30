@@ -1,6 +1,6 @@
 import { tabs } from "@/constants/data";
 import { theme } from "@/constants/theme";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { Tabs } from "expo-router";
 import { Image, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
