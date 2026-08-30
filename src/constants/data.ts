@@ -7,12 +7,14 @@ export const tabs: AppTab[] = [
   { name: "settings", title: "Settings", icon: icons.setting },
 ];
 
-export const HOME_USER = {
+export const USER = {
   name: "Vinay Patil",
+  uri: "https://json-server.dev/ai-profiles/27.png",
 };
 
-export const HOME_BALANCE = {
-  amount: 1200,
+export const BALANCE = {
+  currency: "USD",
+  amount: 2234.3433,
   nextRenewalDate: "2026-10-18T09:00:00.000Z",
 };
 
@@ -105,3 +107,5 @@ export const HOME_SUBSCRIPTIONS: Subscription[] = [
     color: "#b8e8d0",
   },
 ];
+
+export default { user: USER, balance: BALANCE } as const;
