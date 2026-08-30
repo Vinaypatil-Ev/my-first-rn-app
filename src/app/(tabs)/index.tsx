@@ -1,8 +1,11 @@
+import BalanceView from "@/components/home/balanceView";
+import HeadViewAll from "@/components/home/headViewAll";
+import ProfileView from "@/components/home/profileView";
+import UpcomingCard from "@/components/home/upCard";
+import SafeArea from "@/components/safeArea";
 import data from "@/constants/data";
 import { formatCurrency, formatSubscriptionDate } from "@/utils/converter";
-import BalanceView from "../components/balanceView";
-import ProfileView from "../components/profileView";
-import SafeArea from "../components/safeArea";
+
 export default function Index() {
   const { currency, amount, nextRenewalDate: date } = data.balance;
   const { name, uri } = data.user;
@@ -13,6 +16,8 @@ export default function Index() {
         balance={formatCurrency(currency, amount)}
         dt={formatSubscriptionDate(date)}
       />
+      <HeadViewAll heading="Upcoming" />
+      <UpcomingCard />
     </SafeArea>
   );
 }
