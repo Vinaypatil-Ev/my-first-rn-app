@@ -18,8 +18,18 @@ export function formatCurrency(
   return `${symbol}${price.toFixed(2)}`;
 }
 
-export function getDaysLeft(dueDate: Date | string | null | undefined): string {
+export function getDaysLeft(
+  dueDate: Date | string | number | null | undefined,
+): string {
   if (!dueDate) return "Not provided";
+
+  if (typeof dueDate === "number") {
+    if (!Number.isInteger(dueDate)) return "Not provided";
+    if (dueDate < 0) return "Overdue";
+    if (dueDate === 0) return "Last day";
+
+    return `${dueDate} ${dueDate === 1 ? "day" : "days"} left`;
+  }
 
   const parsedDate = new Date(dueDate);
 
@@ -46,8 +56,15 @@ export function getDaysLeft(dueDate: Date | string | null | undefined): string {
   return `${daysLeft} ${daysLeft === 1 ? "day" : "days"} left`;
 }
 
+export type SubscriptionDateFormat =
+  | "dd/mm/yyyy"
+  | "dd/mm"
+  | "month-day-time"
+  | "month-day";
+
 export function formatSubscriptionDate(
   date: Date | string | null | undefined,
+  format: SubscriptionDateFormat = "dd/mm/yyyy",
 ): string {
   if (!date) return "Not provided";
 
@@ -57,8 +74,31 @@ export function formatSubscriptionDate(
 
   const day = String(parsedDate.getDate()).padStart(2, "0");
   const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+  const monthName = parsedDate.toLocaleString("en-US", { month: "long" });
+
+  if (format === "dd/mm") return `${day}/${month}`;
+  if (format === "month-day") return `${monthName} ${parsedDate.getDate()}`;
+
+  if (format === "month-day-time") {
+    const hours = String(parsedDate.getHours()).padStart(2, "0");
+    const minutes = String(parsedDate.getMinutes()).padStart(2, "0");
+
+    return `${monthName} ${parsedDate.getDate()}: ${hours}:${minutes}`;
+  }
 
   return `${day}/${month}/${parsedDate.getFullYear()}`;
+}
+
+export function getBillingStatus(
+  billing: string,
+): "per day" | "per week" | "per month" | "per year" {
+  const normalizedBilling = billing.toLowerCase();
+
+  if (normalizedBilling === "daily") return "per day";
+  if (normalizedBilling === "weekly") return "per week";
+  if (normalizedBilling === "monthly") return "per month";
+
+  return "per year";
 }
 
 export function getSubscriptionStatus(
