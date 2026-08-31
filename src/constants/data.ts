@@ -58,7 +58,7 @@ export const HOME_SUBSCRIPTIONS: Subscription[] = [
     price: 77.49,
     currency: "USD",
     billing: "Monthly",
-    renewalDate: "2026-03-20T10:00:00.000Z",
+    renewalDate: "2026-05-20T10:00:00.000Z",
     color: "#f5c542",
   },
   {
@@ -73,7 +73,7 @@ export const HOME_SUBSCRIPTIONS: Subscription[] = [
     price: 9.99,
     currency: "USD",
     billing: "Monthly",
-    renewalDate: "2026-03-24T10:00:00.000Z",
+    renewalDate: "2026-05-24T10:00:00.000Z",
     color: "#e8def8",
   },
   {
@@ -88,7 +88,7 @@ export const HOME_SUBSCRIPTIONS: Subscription[] = [
     price: 20.0,
     currency: "USD",
     billing: "Monthly",
-    renewalDate: "2026-03-27T10:00:00.000Z",
+    renewalDate: "2026-05-27T10:00:00.000Z",
     color: "#b8d4e3",
   },
   {
@@ -103,9 +103,14 @@ export const HOME_SUBSCRIPTIONS: Subscription[] = [
     price: 119.99,
     currency: "USD",
     billing: "Yearly",
-    renewalDate: "2026-04-02T10:00:00.000Z",
+    renewalDate: "2026-05-02T10:00:00.000Z",
     color: "#b8e8d0",
   },
 ];
 
-export default { user: USER, balance: BALANCE } as const;
+export default {
+  user: USER,
+  balance: BALANCE,
+  upcomming: UPCOMING_SUBSCRIPTIONS,
+  allSubs: HOME_SUBSCRIPTIONS,
+} as const;
