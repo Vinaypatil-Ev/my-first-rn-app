@@ -7,17 +7,76 @@ import SafeArea from "@/components/safeArea";
 import data from "@/constants/data";
 import { theme } from "@/constants/theme";
 import { formatCurrency, formatSubscriptionDate } from "@/utils/converter";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FlatList, Text, View } from "react-native";
+import { useAuth0 } from "react-native-auth0";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+type Auth0Profile = {
+  name?: string;
+  nickname?: string;
+  picture?: string;
+};
 
 function Home() {
   const { currency, amount, nextRenewalDate: date } = data.balance;
-  const { name, uri } = data.user;
+  const { clearCredentials, getCredentials, user } = useAuth0();
   const [isExpanded, setIsExpanded] = useState<string | undefined | null>(null);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isLogoutVisible, setIsLogoutVisible] = useState(false);
+  const [profile, setProfile] = useState<Auth0Profile | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadProfile = async () => {
+      try {
+        const credentials = await getCredentials();
+        const response = await fetch(
+          `https://${process.env.EXPO_PUBLIC_AUTH0_DOMAIN}/userinfo`,
+          { headers: { Authorization: `Bearer ${credentials.accessToken}` } },
+        );
+
+        if (response.ok && isMounted) {
+          setProfile((await response.json()) as Auth0Profile);
+        }
+      } catch {
+        // The ID token profile remains available when the userinfo request fails.
+      }
+    };
+
+    void loadProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [getCredentials]);
+
+  const userName = profile?.name ?? user?.name ?? user?.nickname ?? "Member";
+  const profileUri = profile?.picture ?? user?.picture;
+
+  const handleProfilePress = () => {
+    setIsLogoutVisible((visible) => !visible);
+  };
+
+  const handleLogout = () => {
+    setIsLogoutVisible(false);
+    setIsSigningOut(true);
+    void clearCredentials().finally(() => {
+      setIsSigningOut(false);
+    });
+  };
+
   return (
     <View>
-      <ProfileView userName={name} profileUri={uri} />
+      <ProfileView
+        userName={userName}
+        profileUri={profileUri}
+        isSigningOut={isSigningOut}
+        isLogoutVisible={isLogoutVisible}
+        onProfilePress={handleProfilePress}
+        onLogoutPress={handleLogout}
+      />
       <BalanceView
         balance={formatCurrency(currency, amount)}
         dt={formatSubscriptionDate(date)}
