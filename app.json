@@ -28,6 +28,13 @@
     "plugins": [
       "expo-router",
       [
+        "react-native-auth0",
+        {
+          "domain": "aivinay-autho.us.auth0.com",
+          "customScheme": "myfirstapp"
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#208AEF",
@@ -44,7 +51,7 @@
             "./assets/fonts/PlusJakartaSans-Light.ttf",
             "./assets/fonts/PlusJakartaSans-Medium.ttf",
             "./assets/fonts/PlusJakartaSans-Regular.ttf",
-            "./assets/fonts/PlusJakartaSans-SemiBold.ttf.ttf"
+            "./assets/fonts/PlusJakartaSans-SemiBold.ttf"
           ]
         }
       ]
