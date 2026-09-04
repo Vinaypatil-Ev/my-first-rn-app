@@ -1,13 +1,39 @@
-import { styled } from "nativewind";
-import { Text } from "react-native";
-import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
-const SafeAreaView = styled(RNSafeAreaView);
-const setting = () => {
+import SafeArea from "@/components/safeArea";
+import { useState } from "react";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { useAuth0 } from "react-native-auth0";
+const Settings = () => {
+  const { clearCredentials } = useAuth0();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsSigningOut(true);
+
+    try {
+      await clearCredentials();
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
+
   return (
-    <SafeAreaView className="flex-1 bg-background p-4">
-      <Text>setting</Text>
-    </SafeAreaView>
+    <SafeArea>
+      <View className="flex-1 bg-background p-4">
+        <Text className="text-2xl font-sans-bold text-primary">Settings</Text>
+        <Pressable
+          className="mt-8 items-center rounded bg-red-600 p-4 disabled:opacity-60"
+          disabled={isSigningOut}
+          onPress={handleLogout}
+        >
+          {isSigningOut ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="font-sans-bold text-white">Log out</Text>
+          )}
+        </Pressable>
+      </View>
+    </SafeArea>
   );
 };
 
-export default setting;
+export default Settings;
