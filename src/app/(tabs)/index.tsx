@@ -27,7 +27,6 @@ function Home() {
   const subscriptions = useSubscriptions();
   const { clearCredentials, getCredentials, user } = useAuth0();
   const posthog = usePostHog();
-  const [isExpanded, setIsExpanded] = useState<string | undefined | null>(null);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isLogoutVisible, setIsLogoutVisible] = useState(false);
   const [isCreateVisible, setIsCreateVisible] = useState(false);
@@ -113,35 +112,6 @@ function Home() {
           router.push("/subscription");
         }}
       />
-      <FlatList
-        data={subscriptions}
-        renderItem={({ item }) => (
-          <AllSuscriptions
-            {...{
-              ...item,
-              expanded: isExpanded === item.id,
-              onPress: () => {
-                const willExpand = isExpanded !== item.id;
-                setIsExpanded(willExpand ? item.id : null);
-                posthog.capture(
-                  willExpand
-                    ? "subscription_card_expanded"
-                    : "subscription_card_collapsed",
-                  {
-                    subscription_id: item.id,
-                    subscription_name: item.name,
-                    billing_cycle: item.billing,
-                    status: item.status ?? null,
-                  },
-                );
-              },
-            }}
-          />
-        )}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={<Text>No Subscriptions</Text>}
-      />
       <CreateSubscriptionModal
         visible={isCreateVisible}
         onClose={() => setIsCreateVisible(false)}
@@ -162,13 +132,38 @@ function Home() {
 
 export default function Index() {
   const insets = useSafeAreaInsets();
+  const posthog = usePostHog();
+  const subscriptions = useSubscriptions();
+  const [isExpanded, setIsExpanded] = useState<string | undefined | null>(null);
 
   return (
     <SafeArea>
       <FlatList
-        data={[]}
-        renderItem={() => null}
+        data={subscriptions}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <AllSuscriptions
+            {...item}
+            expanded={isExpanded === item.id}
+            onPress={() => {
+              const willExpand = isExpanded !== item.id;
+              setIsExpanded(willExpand ? item.id : null);
+              posthog.capture(
+                willExpand
+                  ? "subscription_card_expanded"
+                  : "subscription_card_collapsed",
+                {
+                  subscription_id: item.id,
+                  subscription_name: item.name,
+                  billing_cycle: item.billing,
+                  status: item.status ?? null,
+                },
+              );
+            }}
+          />
+        )}
         ListHeaderComponent={<Home />}
+        ListEmptyComponent={<Text>No Subscriptions</Text>}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingBottom:
