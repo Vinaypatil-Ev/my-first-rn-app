@@ -27,6 +27,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-image",
       [
         "react-native-auth0",
         {
