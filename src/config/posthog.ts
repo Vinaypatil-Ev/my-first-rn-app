@@ -40,9 +40,6 @@ export const posthog = new PostHog(projectToken || "placeholder_key", {
   // Capture app lifecycle events (installed, updated, opened, backgrounded)
   captureAppLifecycleEvents: true,
 
-  // Verbose logging in development
-  debug: __DEV__,
-
   // Batching for battery efficiency
   flushAt: 20,
   flushInterval: 10000,
