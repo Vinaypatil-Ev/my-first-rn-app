@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { FlatList, Text, View } from "react-native";
 import { useAuth0 } from "react-native-auth0";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { usePostHog } from "posthog-react-native";
 
 type Auth0Profile = {
   name?: string;
@@ -21,10 +22,19 @@ type Auth0Profile = {
 function Home() {
   const { currency, amount, nextRenewalDate: date } = data.balance;
   const { clearCredentials, getCredentials, user } = useAuth0();
+  const posthog = usePostHog();
   const [isExpanded, setIsExpanded] = useState<string | undefined | null>(null);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isLogoutVisible, setIsLogoutVisible] = useState(false);
   const [profile, setProfile] = useState<Auth0Profile | null>(null);
+
+  useEffect(() => {
+    posthog.capture('home_viewed', {
+      subscription_count: data.allSubs.length,
+      upcoming_count: data.upcomming.length,
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     let isMounted = true;
@@ -98,8 +108,19 @@ function Home() {
             {...{
               ...item,
               expanded: isExpanded === item.id,
-              onPress: () =>
-                setIsExpanded(isExpanded === item.id ? null : item.id),
+              onPress: () => {
+                const willExpand = isExpanded !== item.id
+                setIsExpanded(willExpand ? item.id : null)
+                posthog.capture(
+                  willExpand ? 'subscription_card_expanded' : 'subscription_card_collapsed',
+                  {
+                    subscription_id: item.id,
+                    subscription_name: item.name,
+                    billing_cycle: item.billing,
+                    status: item.status,
+                  }
+                )
+              },
             }}
           />
         )}

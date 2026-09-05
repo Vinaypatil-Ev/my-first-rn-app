@@ -3,9 +3,11 @@ import { Link } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { useAuth0 } from "react-native-auth0";
+import { usePostHog } from "posthog-react-native";
 
 const SignUp = () => {
   const { authorize } = useAuth0();
+  const posthog = usePostHog();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -21,12 +23,16 @@ const SignUp = () => {
         },
         { customScheme: "myfirstapp" },
       );
+      posthog.capture('user_signed_up', { signup_method: 'auth0' })
     } catch (error) {
       if (
         error instanceof Error &&
         error.message !== "a0.session.user_cancelled"
       ) {
         setErrorMessage("Unable to create your account. Please try again.");
+        posthog.captureException(error instanceof Error ? error : new Error('Signup failed'), {
+          signup_method: 'auth0',
+        })
       }
     } finally {
       setIsSubmitting(false);

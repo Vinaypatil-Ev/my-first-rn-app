@@ -9,11 +9,13 @@ import {
   View,
 } from "react-native";
 import { useAuth0 } from "react-native-auth0";
+import { usePostHog } from "posthog-react-native";
 
 type LoginStep = "email" | "password" | "link";
 
 const LogIn = () => {
   const { authorize, loginWithPasswordRealm } = useAuth0();
+  const posthog = usePostHog();
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [step, setStep] = useState<LoginStep>("email");
@@ -54,11 +56,23 @@ const LogIn = () => {
         realm: "Username-Password-Authentication",
         scope: "openid profile email offline_access",
       });
+      // Identify user and capture login event on success
+      posthog.identify(userId.trim(), {
+        $set_once: { first_login_date: new Date().toISOString() },
+      })
+      posthog.capture('user_logged_in', { login_method: 'password' })
     } catch (error) {
       setErrorMessage(
         "Unable to sign in. Check your details and try again." +
           (error instanceof Error ? ` ${error.message}` : ""),
       );
+      posthog.capture('login_failed', {
+        login_method: 'password',
+        error_message: error instanceof Error ? error.message : 'unknown',
+      })
+      posthog.captureException(error instanceof Error ? error : new Error('Login failed'), {
+        login_method: 'password',
+      })
     } finally {
       setIsSubmitting(false);
     }
@@ -73,12 +87,20 @@ const LogIn = () => {
         { scope: "openid profile email offline_access" },
         { customScheme: "myfirstapp" },
       );
+      posthog.capture('user_logged_in', { login_method: 'sso' })
     } catch (error) {
       if (
         error instanceof Error &&
         error.message !== "a0.session.user_cancelled"
       ) {
         setErrorMessage("Unable to sign in. Please try again.");
+        posthog.capture('login_failed', {
+          login_method: 'sso',
+          error_message: error instanceof Error ? error.message : 'unknown',
+        })
+        posthog.captureException(error instanceof Error ? error : new Error('SSO login failed'), {
+          login_method: 'sso',
+        })
       }
     } finally {
       setIsSubmitting(false);
