@@ -7,11 +7,12 @@ import SafeArea from "@/components/safeArea";
 import data from "@/constants/data";
 import { theme } from "@/constants/theme";
 import { formatCurrency, formatSubscriptionDate } from "@/utils/converter";
+import { router } from "expo-router";
+import { usePostHog } from "posthog-react-native";
 import { useEffect, useState } from "react";
 import { FlatList, Text, View } from "react-native";
 import { useAuth0 } from "react-native-auth0";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { usePostHog } from "posthog-react-native";
 
 type Auth0Profile = {
   name?: string;
@@ -29,12 +30,12 @@ function Home() {
   const [profile, setProfile] = useState<Auth0Profile | null>(null);
 
   useEffect(() => {
-    posthog.capture('home_viewed', {
+    posthog.capture("home_viewed", {
       subscription_count: data.allSubs.length,
       upcoming_count: data.upcomming.length,
-    })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -100,7 +101,13 @@ function Home() {
         showsHorizontalScrollIndicator={false}
         ListEmptyComponent={<Text>No Upcomming renewals</Text>}
       />
-      <HeadViewAll title="All Suscriptions" />
+      <HeadViewAll
+        title="All Suscriptions"
+        onViewAll={() => {
+          posthog.capture("all_subscriptions_view_all_pressed");
+          router.push("/subscription");
+        }}
+      />
       <FlatList
         data={data.allSubs}
         renderItem={({ item }) => (
@@ -109,17 +116,19 @@ function Home() {
               ...item,
               expanded: isExpanded === item.id,
               onPress: () => {
-                const willExpand = isExpanded !== item.id
-                setIsExpanded(willExpand ? item.id : null)
+                const willExpand = isExpanded !== item.id;
+                setIsExpanded(willExpand ? item.id : null);
                 posthog.capture(
-                  willExpand ? 'subscription_card_expanded' : 'subscription_card_collapsed',
+                  willExpand
+                    ? "subscription_card_expanded"
+                    : "subscription_card_collapsed",
                   {
                     subscription_id: item.id,
                     subscription_name: item.name,
                     billing_cycle: item.billing,
-                    status: item.status,
-                  }
-                )
+                    status: item.status ?? null,
+                  },
+                );
               },
             }}
           />
