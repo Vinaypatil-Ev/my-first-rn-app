@@ -8,6 +8,7 @@ type ProfileType = {
   isLogoutVisible: boolean;
   onProfilePress: () => void;
   onLogoutPress: () => void;
+  onAddPress: () => void;
 };
 
 const ProfileView = ({
@@ -17,6 +18,7 @@ const ProfileView = ({
   isLogoutVisible,
   onProfilePress,
   onLogoutPress,
+  onAddPress,
 }: ProfileType) => {
   return (
     <View className="relative">
@@ -42,10 +44,14 @@ const ProfileView = ({
         <Text className="grow ml-4 text-3xl font-sans-bold self-center text-primary">
           {userName}
         </Text>
-        <Image
-          className="flex-none size-14 border-2 border-gray-300 rounded-full p-3"
-          source={icons.add}
-        />
+        <Pressable
+          accessibilityLabel="Add subscription"
+          accessibilityRole="button"
+          className="flex-none size-14 items-center justify-center rounded-full border-2 border-gray-300"
+          onPress={onAddPress}
+        >
+          <Image className="size-8" source={icons.add} />
+        </Pressable>
       </View>
       {isLogoutVisible && (
         <Pressable

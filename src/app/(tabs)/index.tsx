@@ -1,3 +1,4 @@
+import CreateSubscriptionModal from "@/components/CreateSubscriptionModal";
 import BalanceView from "@/components/home/balanceView";
 import HeadViewAll from "@/components/home/headViewAll";
 import ProfileView from "@/components/home/profileView";
@@ -6,6 +7,7 @@ import UpcomingCard from "@/components/home/upCard";
 import SafeArea from "@/components/safeArea";
 import data from "@/constants/data";
 import { theme } from "@/constants/theme";
+import { addSubscription, useSubscriptions } from "@/lib/subscriptionStore";
 import { formatCurrency, formatSubscriptionDate } from "@/utils/converter";
 import { router } from "expo-router";
 import { usePostHog } from "posthog-react-native";
@@ -22,16 +24,18 @@ type Auth0Profile = {
 
 function Home() {
   const { currency, amount, nextRenewalDate: date } = data.balance;
+  const subscriptions = useSubscriptions();
   const { clearCredentials, getCredentials, user } = useAuth0();
   const posthog = usePostHog();
   const [isExpanded, setIsExpanded] = useState<string | undefined | null>(null);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isLogoutVisible, setIsLogoutVisible] = useState(false);
+  const [isCreateVisible, setIsCreateVisible] = useState(false);
   const [profile, setProfile] = useState<Auth0Profile | null>(null);
 
   useEffect(() => {
     posthog.capture("home_viewed", {
-      subscription_count: data.allSubs.length,
+      subscription_count: subscriptions.length,
       upcoming_count: data.upcomming.length,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,6 +91,7 @@ function Home() {
         isLogoutVisible={isLogoutVisible}
         onProfilePress={handleProfilePress}
         onLogoutPress={handleLogout}
+        onAddPress={() => setIsCreateVisible(true)}
       />
       <BalanceView
         balance={formatCurrency(currency, amount)}
@@ -109,7 +114,7 @@ function Home() {
         }}
       />
       <FlatList
-        data={data.allSubs}
+        data={subscriptions}
         renderItem={({ item }) => (
           <AllSuscriptions
             {...{
@@ -136,6 +141,20 @@ function Home() {
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={<Text>No Subscriptions</Text>}
+      />
+      <CreateSubscriptionModal
+        visible={isCreateVisible}
+        onClose={() => setIsCreateVisible(false)}
+        onSubmit={(subscription) => {
+          addSubscription(subscription);
+          posthog.capture("subscription_created", {
+            subscription_id: subscription.id,
+            subscription_name: subscription.name,
+            subscription_price: subscription.price,
+            subscription_frequency: subscription.billing,
+            subscription_category: subscription.category,
+          });
+        }}
       />
     </View>
   );

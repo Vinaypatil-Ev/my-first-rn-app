@@ -1,25 +1,27 @@
 import AllSuscriptions from "@/components/home/subCard";
 import SafeArea from "@/components/safeArea";
-import data from "@/constants/data";
+import { theme } from "@/constants/theme";
+import { useSubscriptions } from "@/lib/subscriptionStore";
 import { router } from "expo-router";
+import { usePostHog } from "posthog-react-native";
 import { useEffect, useState } from "react";
 import { FlatList, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { usePostHog } from "posthog-react-native";
-import { theme } from "@/constants/theme";
 
 const Subscription = () => {
   const posthog = usePostHog();
   const insets = useSafeAreaInsets();
+  const subscriptions = useSubscriptions();
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     posthog.capture("subscription_tab_viewed", {
-      subscription_count: data.allSubs.length,
+      subscription_count: subscriptions.length,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [posthog]);
 
-  const filteredSubscriptions = data.allSubs.filter((subscription) => {
+  const filteredSubscriptions = subscriptions.filter((subscription) => {
     const query = searchQuery.trim().toLowerCase();
 
     return (
@@ -44,7 +46,10 @@ const Subscription = () => {
                 subscription_id: item.id,
                 subscription_name: item.name,
               });
-              router.push({ pathname: "/subscription/[id]", params: { id: item.id } });
+              router.push({
+                pathname: "/subscription/[id]",
+                params: { id: item.id },
+              });
             }}
           />
         )}
