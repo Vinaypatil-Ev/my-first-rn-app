@@ -54,8 +54,11 @@ const LogIn = () => {
         realm: "Username-Password-Authentication",
         scope: "openid profile email offline_access",
       });
-    } catch {
-      setErrorMessage("Unable to sign in. Check your details and try again.");
+    } catch (error) {
+      setErrorMessage(
+        "Unable to sign in. Check your details and try again." +
+          (error instanceof Error ? ` ${error.message}` : ""),
+      );
     } finally {
       setIsSubmitting(false);
     }
